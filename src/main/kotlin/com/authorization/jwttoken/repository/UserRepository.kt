@@ -1,60 +1,66 @@
 package com.authorization.jwttoken.repository
 
 import com.authorization.jwttoken.model.User
-import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
-import java.util.*
 
 @Repository
-class UserRepository(
-    private val encoder: PasswordEncoder
-) {
+interface UserRepository
+//    (    private val encoder: PasswordEncoder)
+    : JpaRepository<User, Long> {
 
-    private val users = mutableListOf(
-        User(
-            id = UUID.randomUUID(),
-            email = "user@gmail.com",
-            password = encoder.encode("pass1")
-        ),
-        User(
-            id = UUID.randomUUID(),
-            email = "user1@gmail.com",
-            password = encoder.encode("pass1")
-        ),
-        User(
-            id = UUID.randomUUID(),
-            email = "user2@gmail.com",
-            password = encoder.encode("pass1")
-        ),
-        User(
-            id = UUID.randomUUID(),
-            email = "admin@gmail.com",
-            password = encoder.encode("pass")
-        )
-    )
+//    private val users = mutableListOf(
+//        User(
+//            id = 1,
+//            email = "user@gmail.com",
+//            password = encoder.encode("pass1")
+//        ),
+//        User(
+//            id = 2,
+//            email = "user1@gmail.com",
+//            password = encoder.encode("pass1")
+//        ),
+//        User(
+//            id = 3,
+//            email = "user2@gmail.com",
+//            password = encoder.encode("pass1")
+//        ),
+//        User(
+//            id = 4,
+//            email = "admin@gmail.com",
+//            password = encoder.encode("pass")
+//        )
+//    )
 
-    fun saveUser(user: User): Boolean {
-        val updatedUser = user.copy(password = encoder.encode(user.password))
-        return users.add(updatedUser)
-    }
 
-    fun findByEmail(email: String): User? =
-        users.firstOrNull {
-            it.email == email
-        }
+//    fun saveUser(user: User): Boolean {
+//        val updatedUser = user.copy(password = encoder.encode(user.password))
+//        return users.add(updatedUser)
+//    }
 
-    fun findAll(): List<User> = users
 
-    fun findById(id: UUID): User? =
-        users.firstOrNull {
-            it.id == id
-        }
+    @Query(value = "SELECT * FROM users WHERE email = :email", nativeQuery = true)
+    fun findByEmail(@Param("email") email: String): User?
+//        users.firstOrNull {
+//            it.email == email
+//        }
 
-    fun deleteUserById(id: UUID): Boolean {
-        val user = findById(id)
-        return user.let {
-            users.remove(it)
-        }
-    }
+    //    fun findAll(): List<User> = users
+    @Query(value = "SELECT * FROM users WHERE id = :id", nativeQuery = true)
+    fun findUserById(@Param("id") id: Long): User?
+//    =
+//        users.firstOrNull {
+//            it.id == id
+//        }
+
+    @Query(value = "DELETE FROM users WHERE id = :id", nativeQuery = true)
+    fun deleteUserById(@Param("id") id: Long): Boolean
+//        val user = findById(id)
+//        return user.let {
+//            users.remove(it)
+//        }
+//    }
 
 }

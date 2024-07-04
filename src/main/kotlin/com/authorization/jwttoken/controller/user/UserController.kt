@@ -4,6 +4,7 @@ import com.authorization.jwttoken.model.User
 import com.authorization.jwttoken.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.util.IdGenerator
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
@@ -15,7 +16,7 @@ class UserController(private val userService: UserService) {
 
     @PostMapping()
     fun createUser(@RequestBody userRequest: UserRequest): UserResponse =
-        userService.createUser(
+        userService.saveUser(
             user = userRequest.toModel()
         )?.toResponse()
             ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot make user.")
@@ -28,7 +29,7 @@ class UserController(private val userService: UserService) {
         }
 
     @GetMapping("/{id}")
-    fun findById(@PathVariable id: UUID): UserResponse {
+    fun findById(@PathVariable id: Long): UserResponse {
         return userService.findById(id)?.toResponse() ?: throw ResponseStatusException(
             HttpStatus.NOT_FOUND,
             "Cannot Find User."
@@ -36,7 +37,7 @@ class UserController(private val userService: UserService) {
     }
 
     @DeleteMapping("/{id}")
-    fun deleteById(@PathVariable id: UUID): ResponseEntity<Boolean> {
+    fun deleteById(@PathVariable id: Long): ResponseEntity<Boolean> {
         val success = userService.deleteById(id)
         return if (success) {
             ResponseEntity.noContent()
@@ -51,9 +52,8 @@ class UserController(private val userService: UserService) {
 
     private fun UserRequest.toModel(): User =
         User(
-            id = UUID.randomUUID(),
-            this.email,
-            this.password,
+            email= this.email,
+            password = this.password,
         )
 
     private fun User.toResponse(): UserResponse =

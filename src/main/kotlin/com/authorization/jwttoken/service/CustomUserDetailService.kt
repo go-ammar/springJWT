@@ -20,5 +20,6 @@ class CustomUserDetailService(private val userRepository: UserRepository) : User
         User.builder()
             .username(this.email)
             .password(this.password)
+            .roles(this.id.toString())
             .build()
 }

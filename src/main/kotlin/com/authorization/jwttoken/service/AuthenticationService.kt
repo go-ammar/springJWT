@@ -7,6 +7,7 @@ import com.authorization.jwttoken.repository.RefreshTokenRepository
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import java.util.*
@@ -17,7 +18,8 @@ class AuthenticationService(
     @Qualifier("customUserDetailService") private val userDetailService: CustomUserDetailService,
     private val tokenService: TokenService,
     private val jwtProperties: JwtProperties,
-    private val refreshTokenRepository: RefreshTokenRepository
+    private val refreshTokenRepository: RefreshTokenRepository,
+    private val userService: UserService
 ) {
 
     fun authentication(authenticationRequest: AuthenticationRequest): AuthenticationResponse {
@@ -30,14 +32,25 @@ class AuthenticationService(
 
         val user = userDetailService.loadUserByUsername(authenticationRequest.email)
 
+
+        val x = user.authorities.first().authority
+
+
+
         val accessToken = createAccessToken(user)
         val refreshToken = createRefreshToken(user)
 
         refreshTokenRepository.save(refreshToken, user)
 
+        val v = SecurityContextHolder.getContext().authentication
+
+//        val useObject = userService.findById(x.substring(5))
+
+
         return AuthenticationResponse(
             accessToken = accessToken,
-            refreshToken = refreshToken
+            refreshToken = refreshToken,
+            userId = x.substring(5)
         )
     }
 

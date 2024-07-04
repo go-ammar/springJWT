@@ -23,14 +23,12 @@ class SecurityConfiguration(private val authenticationProvider: AuthenticationPr
     }
         .authorizeHttpRequests {
             it
-                .requestMatchers("/api/auth", "api/auth/refresh", "/error", "/api/budget")
+                .requestMatchers("/api/auth", "api/auth/refresh", "/error", "/api/budget","/api/user/**")
                 .permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/user", "/api/budget")
+                .requestMatchers(HttpMethod.POST, "/api/user", "/api/budget/create")
                 .permitAll()
-                .requestMatchers("/api/user**")
-                .hasRole("ADMIN")
-                .anyRequest()
-                .fullyAuthenticated()
+//                .requestMatchers("/api/user**")
+//                .fullyAuthenticated()
         }
         .sessionManagement {
             it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

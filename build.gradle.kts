@@ -49,7 +49,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     testImplementation("org.springframework.security:spring-security-test")
 
-
+    implementation("mysql:mysql-connector-java:8.0.32")
 
 }
 
