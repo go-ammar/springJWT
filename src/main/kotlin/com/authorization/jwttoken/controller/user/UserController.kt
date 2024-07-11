@@ -2,17 +2,20 @@ package com.authorization.jwttoken.controller.user
 
 import com.authorization.jwttoken.model.User
 import com.authorization.jwttoken.service.UserService
+import com.authorization.jwttoken.util.JwtUtil
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.util.IdGenerator
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
-import java.util.*
 
 
 @RestController
 @RequestMapping("/api/user")
-class UserController(private val userService: UserService) {
+class UserController @Autowired constructor(
+    private val userService: UserService,
+    private val jwtUtil: JwtUtil
+) {
 
     @PostMapping()
     fun createUser(@RequestBody userRequest: UserRequest): UserResponse =
@@ -21,6 +24,13 @@ class UserController(private val userService: UserService) {
         )?.toResponse()
             ?: throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Cannot make user.")
 
+
+    @GetMapping("/user")
+    fun getUserDetails(@RequestHeader("Authorization") token: String): Map<String, String> {
+        val jwt = token.substring(7) // Remove "Bearer " prefix
+        val userId = jwtUtil.extractUserId(jwt)
+        return mapOf("userId" to userId)
+    }
 
     @GetMapping
     fun getAllUser(): List<UserResponse> =
@@ -52,7 +62,7 @@ class UserController(private val userService: UserService) {
 
     private fun UserRequest.toModel(): User =
         User(
-            email= this.email,
+            email = this.email,
             password = this.password,
         )
 
