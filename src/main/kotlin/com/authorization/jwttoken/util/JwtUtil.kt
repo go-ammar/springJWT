@@ -1,5 +1,7 @@
 package com.authorization.jwttoken.util
 
+import com.authorization.jwttoken.model.User
+import com.google.gson.Gson
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
@@ -32,6 +34,11 @@ class JwtUtil {
             .verifyWith(key)
             .build()
             .parseSignedClaims(token).payload
+    }
+
+    fun extractUser(token: String): User? {
+        val claims = extractAllClaims(token)
+        return Gson().fromJson(claims["user"].toString(), User::class.java)
     }
 
 }

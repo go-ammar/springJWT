@@ -17,7 +17,7 @@ class UserController @Autowired constructor(
     private val jwtUtil: JwtUtil
 ) {
 
-    @PostMapping()
+    @PostMapping
     fun createUser(@RequestBody userRequest: UserRequest): UserResponse =
         userService.saveUser(
             user = userRequest.toModel()
@@ -40,10 +40,7 @@ class UserController @Autowired constructor(
 
     @GetMapping("/{id}")
     fun findById(@PathVariable id: Long): UserResponse {
-        return userService.findById(id)?.toResponse() ?: throw ResponseStatusException(
-            HttpStatus.NOT_FOUND,
-            "Cannot Find User."
-        )
+        return userService.findById(id).toResponse()
     }
 
     @DeleteMapping("/{id}")

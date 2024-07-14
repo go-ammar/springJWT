@@ -31,10 +31,10 @@ class UserService(
 
 
     fun findById(id: Long): User {
-        val todo = userRepository.findUserById(id)
-        if (todo == null){
+        val user = userRepository.findUserById(id)
+        if (user == null){
             throw UserNotFoundException("User not found!")
-        }else return todo
+        }else return user
     }
 
     fun findAll(): List<User> {

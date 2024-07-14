@@ -13,10 +13,17 @@ typealias ApplicationUser = com.authorization.jwttoken.model.User
 @Service
 @Qualifier("customUserDetailService")
 class CustomUserDetailService(private val userRepository: UserRepository) : UserDetailsService {
+
     override fun loadUserByUsername(username: String): UserDetails = userRepository.findByEmail(username)
         ?.mapToUserDetails() ?: throw UsernameNotFoundException("User not found!")
 
-    private fun ApplicationUser.mapToUserDetails(): UserDetails =
+
+    fun loadUserByEmail(username: String): ApplicationUser {
+        return userRepository.findByEmail(username)
+            ?: throw UsernameNotFoundException("User not found!")
+    }
+
+    fun ApplicationUser.mapToUserDetails(): UserDetails =
         User.builder()
             .username(this.email)
             .password(this.password)

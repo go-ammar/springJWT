@@ -23,12 +23,16 @@ class SecurityConfiguration(private val authenticationProvider: AuthenticationPr
     }
         .authorizeHttpRequests {
             it
-                .requestMatchers("/api/auth", "api/auth/refresh", "/error", "/api/budget","/api/user/**")
+                .requestMatchers("/api/auth", "api/auth/refresh", "/error", "/api/budget/**","/api/user/**")
                 .permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/user", "/api/budget/create")
                 .permitAll()
-//                .requestMatchers("/api/user**")
-//                .fullyAuthenticated()
+                .requestMatchers(HttpMethod.PUT, "/api/budget/update")
+                .permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/budget/delete**")
+                .permitAll()
+                .requestMatchers("/api/user**")
+                .fullyAuthenticated()
         }
         .sessionManagement {
             it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

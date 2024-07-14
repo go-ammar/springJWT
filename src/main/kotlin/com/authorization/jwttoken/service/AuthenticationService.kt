@@ -3,7 +3,9 @@ package com.authorization.jwttoken.service
 import com.authorization.jwttoken.config.JwtProperties
 import com.authorization.jwttoken.controller.auth.AuthenticationRequest
 import com.authorization.jwttoken.controller.auth.AuthenticationResponse
+import com.authorization.jwttoken.exceptions.TokenNotFoundException
 import com.authorization.jwttoken.repository.RefreshTokenRepository
+import com.authorization.jwttoken.util.Utils.mapToUserDetails
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -23,6 +25,7 @@ class AuthenticationService(
 ) {
 
     fun authentication(authenticationRequest: AuthenticationRequest): AuthenticationResponse {
+
         authManager.authenticate(
             UsernamePasswordAuthenticationToken(
                 authenticationRequest.email,
@@ -30,27 +33,21 @@ class AuthenticationService(
             )
         )
 
-        val user = userDetailService.loadUserByUsername(authenticationRequest.email)
+        val user = userDetailService.loadUserByEmail(authenticationRequest.email)
+        val userSpring = user.mapToUserDetails()
 
+        val map: MutableMap<String, ApplicationUser> = mutableMapOf()
+        map["user"] = user
 
-        val x = user.authorities.first().authority
-
-
-
-        val accessToken = createAccessToken(user)
-        val refreshToken = createRefreshToken(user)
+        val accessToken = createAccessToken(userSpring, map)
+        val refreshToken = createRefreshToken(userSpring)
 
         refreshTokenRepository.save(refreshToken, user)
-
-        val v = SecurityContextHolder.getContext().authentication
-
-//        val useObject = userService.findById(x.substring(5))
-
 
         return AuthenticationResponse(
             accessToken = accessToken,
             refreshToken = refreshToken,
-            userId = x.substring(5)
+            userId = user.id.toString()
         )
     }
 
@@ -58,20 +55,29 @@ class AuthenticationService(
         val extractedEmail = tokenService.extractEmail(refreshToken)
 
         return extractedEmail?.let { email ->
-            val currentUserDetails = userDetailService.loadUserByUsername(email)
+            val currentUserDetails = userDetailService.loadUserByEmail(email)
             val refreshTokenUserDetails = refreshTokenRepository.findUserDetailsByToken(refreshToken)
 
-            if (!tokenService.isExpired(refreshToken) && refreshTokenUserDetails?.username == currentUserDetails.username)
-                createAccessToken(currentUserDetails)
+            val currentUserDetailsSpring = currentUserDetails.mapToUserDetails()
+
+
+            val map: MutableMap<String, ApplicationUser> = mutableMapOf()
+            map["user"] = currentUserDetails
+
+            currentUserDetails.mapToUserDetails()
+            if (!tokenService.isExpired(refreshToken) && refreshTokenUserDetails?.email == currentUserDetailsSpring.username)
+                createAccessToken(currentUserDetailsSpring, map)
             else
-                null
+                throw TokenNotFoundException()
         }
     }
 
-    private fun createAccessToken(user: UserDetails) = tokenService.generate(
-        userDetails = user,
-        expirationDate = getAccessTokenExpiration()
-    )
+    private fun createAccessToken(user: UserDetails, userObj: MutableMap<String, ApplicationUser>) =
+        tokenService.generate(
+            userDetails = user,
+            expirationDate = getAccessTokenExpiration(),
+            additionalClaims = userObj
+        )
 
     private fun createRefreshToken(user: UserDetails) = tokenService.generate(
         userDetails = user,

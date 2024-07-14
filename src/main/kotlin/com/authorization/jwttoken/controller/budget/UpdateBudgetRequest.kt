@@ -1,8 +1,8 @@
 package com.authorization.jwttoken.controller.budget
 
-data class BudgetRequest(
+data class UpdateBudgetRequest(
+    val id : Long,
     val category: String,
     val months: String,
-    val amount: Int,
-//    val userId: Long
+    val amount: Int
 )

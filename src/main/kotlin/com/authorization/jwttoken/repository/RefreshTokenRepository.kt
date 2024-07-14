@@ -1,5 +1,6 @@
 package com.authorization.jwttoken.repository
 
+import com.authorization.jwttoken.model.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Repository
 
@@ -7,13 +8,13 @@ import org.springframework.stereotype.Repository
 class RefreshTokenRepository {
 
 
-    private val tokens = mutableMapOf<String, UserDetails>()
+    private val tokens = mutableMapOf<String, User>()
 
-    fun findUserDetailsByToken(token: String): UserDetails? {
+    fun findUserDetailsByToken(token: String): User? {
         return tokens[token]
     }
 
-    fun save(token: String, userDetails: UserDetails) {
+    fun save(token: String, userDetails: User) {
         tokens[token] = userDetails
     }
 
