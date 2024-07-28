@@ -13,6 +13,9 @@ interface BudgetRepository : JpaRepository<Budget, Long> {
     @Query(value = "SELECT * FROM budget WHERE user_id = :userId", nativeQuery = true)
     fun getUserBudgets(@Param("userId") userId: String): List<Budget>
 
+    @Query(value = "SELECT * FROM budget WHERE user_id = :userId AND category = :category", nativeQuery = true)
+    fun findByCategoryAndUser(@Param("category") category: String, @Param("userId") userId: String): List<Budget?>
+
     @Modifying
     @Query("UPDATE Budget b SET b.category = :category, b.months = :months, b.amount = :amount WHERE b.id = :id")
     fun updateBudget(
@@ -23,8 +26,7 @@ interface BudgetRepository : JpaRepository<Budget, Long> {
     )
 
     @Modifying
-    @Query("UPDATE Budget b SET b.category = :category, b.months = :months, b.amount = :amount WHERE b.id = :id")
-    fun deleteBudget(
-        @Param("id") id: String)
+    @Query("delete from Budget b where b.id = :id")
+    fun deleteBudget(@Param("id") id: String)
 
 }

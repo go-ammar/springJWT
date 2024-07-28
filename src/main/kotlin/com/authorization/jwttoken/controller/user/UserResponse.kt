@@ -1,8 +1,9 @@
 package com.authorization.jwttoken.controller.user
 
-import java.util.*
-
-data class UserResponse (
+data class UserResponse(
     val id: Long,
-    val email: String
+    val email: String,
+    val name: String,
+    val dob: Long,
+    var updatedToken: String = ""
 )

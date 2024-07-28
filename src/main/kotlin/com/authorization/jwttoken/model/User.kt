@@ -18,5 +18,15 @@ data class User(
 
     @field:NotBlank(message = "Month must not be blank")
     @Column(name = "email", nullable = false, unique = true)
-    val email: String
-)
+    val email: String,
+
+
+    @field:NotBlank(message = "Name must not be blank")
+    @Column(name = "name", nullable = false, unique = false)
+    var name: String,
+
+    @field:NotNull(message = "Date of birth must not be blank")
+    @Column(name = "dob", nullable = false, unique = false)
+    val dob: Long
+
+    )

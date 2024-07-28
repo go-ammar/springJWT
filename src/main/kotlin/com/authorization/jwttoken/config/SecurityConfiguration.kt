@@ -19,20 +19,22 @@ class SecurityConfiguration(private val authenticationProvider: AuthenticationPr
         http: HttpSecurity,
         jwtAuthenticationFilter: JwtAuthenticationFilter
     ): DefaultSecurityFilterChain = http.csrf {
-        it.disable()
+            it.disable()
     }
         .authorizeHttpRequests {
             it
-                .requestMatchers("/api/auth", "api/auth/refresh", "/error", "/api/budget/**","/api/user/**")
+                .requestMatchers("/api/auth", "api/auth/refresh", "/error", "/api/budget/**","/api/user/**",
+                    "/api/transaction")
                 .permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/user", "/api/budget/create")
+                .requestMatchers(HttpMethod.POST, "/api/user", "/api/budget/create", "/api/user/update",
+                    "/api/transaction")
                 .permitAll()
                 .requestMatchers(HttpMethod.PUT, "/api/budget/update")
                 .permitAll()
                 .requestMatchers(HttpMethod.DELETE, "/api/budget/delete**")
                 .permitAll()
-                .requestMatchers("/api/user**")
-                .fullyAuthenticated()
+//                .requestMatchers("/api/user**")
+//                .fullyAuthenticated()
         }
         .sessionManagement {
             it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)

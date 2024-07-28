@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class TokenService(private val jwtProperties: JwtProperties) {
+class TokenService(jwtProperties: JwtProperties) {
 
     private val secretKey = Keys.hmacShaKeyFor(
         jwtProperties.key.toByteArray()

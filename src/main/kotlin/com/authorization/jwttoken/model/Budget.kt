@@ -12,8 +12,8 @@ data class Budget(
     @SequenceGenerator(name = "budget_sequence", sequenceName = "budget_sequence", allocationSize = 1)
     val id: Long = 0,
 
-    @field:NotBlank(message = "Category must not be blank")
-    @Column(name = "category", nullable = false)
+    @field:NotBlank(message = "Category must be Unique")
+    @Column(name = "category", nullable = false, unique = true)
     var category: String,
 
     @field:NotBlank(message = "Month must not be blank")

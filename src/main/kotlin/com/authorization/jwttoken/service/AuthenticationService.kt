@@ -4,12 +4,13 @@ import com.authorization.jwttoken.config.JwtProperties
 import com.authorization.jwttoken.controller.auth.AuthenticationRequest
 import com.authorization.jwttoken.controller.auth.AuthenticationResponse
 import com.authorization.jwttoken.exceptions.TokenNotFoundException
+import com.authorization.jwttoken.model.User
 import com.authorization.jwttoken.repository.RefreshTokenRepository
 import com.authorization.jwttoken.util.Utils.mapToUserDetails
+import com.google.gson.Gson
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 import java.util.*
@@ -36,8 +37,18 @@ class AuthenticationService(
         val user = userDetailService.loadUserByEmail(authenticationRequest.email)
         val userSpring = user.mapToUserDetails()
 
-        val map: MutableMap<String, ApplicationUser> = mutableMapOf()
-        map["user"] = user
+        val map: MutableMap<String, String> = mutableMapOf()
+        map["user"] = Gson().toJson(
+            User(
+                email = user.email,
+                password = user.password,
+                id = user.id,
+                name = user.name,
+                dob = user.dob
+            )
+        )
+
+//        User(email = user.email, password = user.password, id = user.id, name = user.name, dob = user.dob)
 
         val accessToken = createAccessToken(userSpring, map)
         val refreshToken = createRefreshToken(userSpring)
@@ -61,8 +72,17 @@ class AuthenticationService(
             val currentUserDetailsSpring = currentUserDetails.mapToUserDetails()
 
 
-            val map: MutableMap<String, ApplicationUser> = mutableMapOf()
-            map["user"] = currentUserDetails
+            val map: MutableMap<String, String> = mutableMapOf()
+            map["user"] = Gson().toJson(
+                User(
+                    email = currentUserDetails.email,
+                    password = currentUserDetails.password,
+                    id = currentUserDetails.id,
+                    name = currentUserDetails.name,
+                    dob = currentUserDetails.dob
+                )
+            )
+//            currentUserDetails
 
             currentUserDetails.mapToUserDetails()
             if (!tokenService.isExpired(refreshToken) && refreshTokenUserDetails?.email == currentUserDetailsSpring.username)
@@ -72,7 +92,7 @@ class AuthenticationService(
         }
     }
 
-    private fun createAccessToken(user: UserDetails, userObj: MutableMap<String, ApplicationUser>) =
+    private fun createAccessToken(user: UserDetails, userObj: MutableMap<String, String>) =
         tokenService.generate(
             userDetails = user,
             expirationDate = getAccessTokenExpiration(),

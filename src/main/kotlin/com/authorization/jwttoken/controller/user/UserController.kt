@@ -3,9 +3,12 @@ package com.authorization.jwttoken.controller.user
 import com.authorization.jwttoken.model.User
 import com.authorization.jwttoken.service.UserService
 import com.authorization.jwttoken.util.JwtUtil
+import com.authorization.jwttoken.util.Utils.mapToUserDetails
+import jakarta.validation.Valid
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 
@@ -32,11 +35,27 @@ class UserController @Autowired constructor(
         return mapOf("userId" to userId)
     }
 
+    @GetMapping("/details")
+    fun getUserDetailsByJwtToken(@RequestHeader("Authorization") token: String): ResponseEntity<UserResponse> {
+        val jwt = token.substring(7) // Remove "Bearer " prefix
+        val user = jwtUtil.extractUser(jwt)
+        return ResponseEntity(user?.toResponse(), HttpStatus.OK)
+    }
+
     @GetMapping
     fun getAllUser(): List<UserResponse> =
         userService.findAll().map {
             it.toResponse()
         }
+
+    @PostMapping("/update")
+    fun updateUser(
+        @Valid @RequestBody request: UpdateUserRequest,
+        @RequestHeader("Authorization") authHeader: String
+    ): ResponseEntity<UserResponse> {
+        return ResponseEntity(userService.updateUser(request, authHeader.substringAfter("Bearer ")), HttpStatus.OK)
+    }
+
 
     @GetMapping("/{id}")
     fun findById(@PathVariable id: Long): UserResponse {
@@ -61,12 +80,16 @@ class UserController @Autowired constructor(
         User(
             email = this.email,
             password = this.password,
+            name = this.name,
+            dob = this.dob
         )
 
     private fun User.toResponse(): UserResponse =
         UserResponse(
             id = this.id,
-            email = this.email
+            email = this.email,
+            name = this.name,
+            dob = this.dob
         )
 
 

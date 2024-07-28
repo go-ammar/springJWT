@@ -10,5 +10,5 @@ class JwtTokenApplication
 
 fun main(args: Array<String>) {
 	runApplication<JwtTokenApplication>(*args)
-	print("we in")
+	println("we in")
 }
