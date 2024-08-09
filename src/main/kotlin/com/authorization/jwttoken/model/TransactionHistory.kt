@@ -17,7 +17,7 @@ data class TransactionHistory (
     var category: String,
 
     @field:NotNull(message = "Date needs to set")
-    @Column(name = "transactionDate", nullable = false, unique = false)
+    @Column(name = "transaction_date", nullable = false, unique = false)
     val transactionDate: Long,
 
     @field:NotNull(message = "Amount must not be null")
@@ -25,6 +25,6 @@ data class TransactionHistory (
     var amount: Int,
 
     @field:NotNull(message = "UserId must not be null")
-    @Column(name = "userId", nullable = false)
+    @Column(name = "user_id", nullable = false)
     val userId: String,
 )

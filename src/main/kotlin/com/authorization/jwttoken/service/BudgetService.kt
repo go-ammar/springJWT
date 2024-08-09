@@ -1,8 +1,10 @@
 package com.authorization.jwttoken.service
 
 import com.authorization.jwttoken.controller.budget.BudgetRequest
+import com.authorization.jwttoken.controller.budget.MonthlyCategorySpend
 import com.authorization.jwttoken.controller.budget.UpdateBudgetRequest
 import com.authorization.jwttoken.exceptions.CategoryExistsException
+import com.authorization.jwttoken.exceptions.NoCategoryForUser
 import com.authorization.jwttoken.exceptions.UserExistsException
 import com.authorization.jwttoken.model.Budget
 import com.authorization.jwttoken.repository.BudgetRepository
@@ -34,7 +36,7 @@ class BudgetService(
         if (budgetFound.isEmpty()) {
             val budget = Budget(
                 category = createRequest.category,
-                months = createRequest.months,
+//                months = createRequest.months,
                 amount = createRequest.amount,
                 userId = jwtUtil.extractUser(token)!!.id.toString()
             )
@@ -54,7 +56,7 @@ class BudgetService(
             id = updateRequest.id.toString(),
             amount = updateRequest.amount.toString(),
             category = updateRequest.category,
-            months = updateRequest.months
+//            months = updateRequest.months
         )
 
         val userId = jwtUtil.extractUser(token)!!.id.toString()
@@ -62,10 +64,25 @@ class BudgetService(
             id = updateRequest.id,
             amount = updateRequest.amount,
             category = updateRequest.category,
-            months = updateRequest.months,
+//            months = updateRequest.months,
             userId = userId
         )
         return savedBudget
+    }
+
+    fun getBudgetCategories(token: String) : List<String>{
+
+        val userId = jwtUtil.extractUser(token)!!.id.toString()
+
+        val categories = repository.findCategoryByUser(userId)
+
+        if (categories?.isEmpty() == true){
+            throw
+            NoCategoryForUser()
+        } else {
+            return categories as List<String>
+        }
+
     }
 
     @Transactional
@@ -73,4 +90,18 @@ class BudgetService(
         repository.deleteById(id)
     }
 
+    fun getMonthlySpendByUser(token: String): List<MonthlyCategorySpend> {
+        val userId = jwtUtil.extractUser(token)!!.id.toString()
+
+        val results = repository.findMonthlyCategorySpendByUserId(userId)
+        return results.map { result ->
+            MonthlyCategorySpend(
+                category = result[0] as String,
+                month = (result[1] as Number).toInt(),
+                year = (result[2] as Number).toInt(),
+                totalAmount = (result[3] as Number).toInt(),
+                budgetAmount = (result[4] as Number).toInt()
+            )
+        }
+    }
 }

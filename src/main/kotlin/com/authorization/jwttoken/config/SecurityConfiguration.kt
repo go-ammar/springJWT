@@ -24,7 +24,7 @@ class SecurityConfiguration(private val authenticationProvider: AuthenticationPr
         .authorizeHttpRequests {
             it
                 .requestMatchers("/api/auth", "api/auth/refresh", "/error", "/api/budget/**","/api/user/**",
-                    "/api/transaction")
+                    "/api/transaction", "api/monthly-spend")
                 .permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/user", "/api/budget/create", "/api/user/update",
                     "/api/transaction")

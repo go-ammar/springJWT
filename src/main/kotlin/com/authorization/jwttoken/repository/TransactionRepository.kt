@@ -15,5 +15,4 @@ interface TransactionRepository : JpaRepository<TransactionHistory, Long> {
     fun getUserTransactions(@Param("userId") userId: String): List<TransactionHistory>
 
 
-
 }

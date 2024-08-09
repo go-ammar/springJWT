@@ -31,6 +31,13 @@ class BudgetController(private val service: BudgetService) {
         return ResponseEntity(service.createBudget(request, authHeader.substringAfter("Bearer ")), HttpStatus.OK)
     }
 
+    @GetMapping("/categories")
+    fun getBudgetCategories(
+        @RequestHeader("Authorization") authHeader: String
+    ): ResponseEntity<List<String>> {
+        return ResponseEntity(service.getBudgetCategories(authHeader.substringAfter("Bearer ")), HttpStatus.OK)
+    }
+
     @PutMapping("/update")
     fun updateBudget(
         @Valid @RequestBody request: UpdateBudgetRequest,
@@ -46,6 +53,13 @@ class BudgetController(private val service: BudgetService) {
     ): ResponseEntity<Void> {
         service.deleteBudget(id)
         return ResponseEntity.noContent().build()
+    }
+
+
+
+    @GetMapping("/monthly-spend")
+    fun getMonthlySpendByUser(@RequestHeader("Authorization") authHeader: String): ResponseEntity<List<MonthlyCategorySpend>> {
+        return ResponseEntity(service.getMonthlySpendByUser(authHeader.substringAfter("Bearer ")), HttpStatus.OK)
     }
 
 }
