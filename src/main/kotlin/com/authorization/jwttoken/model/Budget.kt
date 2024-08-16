@@ -16,10 +16,6 @@ data class Budget(
     @Column(name = "category", nullable = false, unique = true)
     var category: String,
 
-//    @field:NotBlank(message = "Month must not be blank")
-//    @Column(name = "months", nullable = false)
-//    var months: String,
-
     @field:NotNull(message = "Amount must not be null")
     @Column(name = "amount", nullable = false)
     var amount: Int,

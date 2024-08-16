@@ -24,10 +24,10 @@ class SecurityConfiguration(private val authenticationProvider: AuthenticationPr
         .authorizeHttpRequests {
             it
                 .requestMatchers("/api/auth", "api/auth/refresh", "/error", "/api/budget/**","/api/user/**",
-                    "/api/transaction", "api/monthly-spend")
+                    "/api/transaction", "api/monthly-spend", "/api/groups**","/api/groups/transactions**" )
                 .permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/user", "/api/budget/create", "/api/user/update",
-                    "/api/transaction")
+                    "/api/transaction", "/api/groups/create", "/api/groups/transactions**")
                 .permitAll()
                 .requestMatchers(HttpMethod.PUT, "/api/budget/update")
                 .permitAll()
